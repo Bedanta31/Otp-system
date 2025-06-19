@@ -1,4 +1,5 @@
 let phoneNumber = "";
+dhdjsjshsjsjsjsutwhw
 
 function sendOTP() {
   const phone = document.getElementById("phone").value;
