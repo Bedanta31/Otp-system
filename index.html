@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Firebase OTP Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word Finder OTP Login</title>
   <link rel="stylesheet" href="style.css">
-  <script type="module" src="script.js"></script>
 </head>
 <body>
   <div class="container">
-    <h2>📱 Firebase OTP Authentication</h2>
+    <h2>🔐 Word Finder Login</h2>
 
     <input type="text" id="phone" placeholder="+91XXXXXXXXXX" />
-    <div id="recaptcha-container"></div>
     <button onclick="sendOTP()">Send OTP</button>
 
     <input type="text" id="otp" placeholder="Enter OTP" />
     <button onclick="verifyOTP()">Verify OTP</button>
   </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
