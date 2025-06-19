@@ -1,65 +1,50 @@
-// Firebase Setup
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import {
-  getAuth,
-  RecaptchaVerifier,
-  signInWithPhoneNumber
-} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+const API_URL = 'https://word-finder-9lr4.onrender.com'; // Your live backend
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDnKHoj2smR0z9zCZH5A9fJCsFokd9U_ag",
-  authDomain: "otp-system-71b21.firebaseapp.com",
-  projectId: "otp-system-71b21",
-  storageBucket: "otp-system-71b21.appspot.com",
-  messagingSenderId: "767014524390",
-  appId: "1:767014524390:web:5ca45f8a31fbbf194af227"
-};
+let sessionId = null;
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// Send OTP
+function sendOTP() {
+  const phone = document.getElementById("phone").value;
 
-// Setup reCAPTCHA
-window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-  size: "normal",
-  callback: (response) => {
-    console.log("reCAPTCHA verified ✅");
-  },
-  "expired-callback": () => {
-    alert("reCAPTCHA expired. Please verify again.");
-  }
-});
-recaptchaVerifier.render();
+  fetch(`${API_URL}/send-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("✅ OTP sent to your phone!");
+      sessionId = data.sessionId;
+    } else {
+      alert("❌ Error: " + data.message);
+    }
+  })
+  .catch((err) => {
+    console.error(err);
+    alert("Server error while sending OTP!");
+  });
+}
 
-// 🔐 Send OTP
-window.sendOTP = function () {
-  const phoneNumber = document.getElementById("phone").value;
+// Verify OTP
+function verifyOTP() {
+  const otp = document.getElementById("otp").value;
 
-  signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
-    .then((confirmationResult) => {
-      window.confirmationResult = confirmationResult;
-      alert("OTP sent to " + phoneNumber);
-    })
-    .catch((error) => {
-      alert("Error sending OTP: " + error.message);
-      console.error(error);
-    });
-};
-
-// ✅ Verify OTP
-window.verifyOTP = function () {
-  const code = document.getElementById("otp").value;
-
-  if (!window.confirmationResult) {
-    alert("Please request OTP first!");
-    return;
-  }
-
-  window.confirmationResult.confirm(code)
-    .then((result) => {
-      alert("Phone number verified! 🎉");
-      console.log("User:", result.user);
-    })
-    .catch((error) => {
-      alert("Invalid OTP: " + error.message);
-    });
-};
+  fetch(`${API_URL}/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code: otp, sessionId })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("🎉 OTP Verified! Welcome to Word Finder.");
+    } else {
+      alert("❌ Invalid OTP!");
+    }
+  })
+  .catch((err) => {
+    console.error(err);
+    alert("Server error while verifying OTP.");
+  });
+}
