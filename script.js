@@ -1,53 +1,57 @@
 let phoneNumber = "";
 
 function sendOTP() {
-  phoneNumber = document.getElementById("phone").value.trim();
-
-  if (!phoneNumber.startsWith("+")) {
-    alert("Use international format like +91...");
-    return;
-  }
+  const phone = document.getElementById("phone").value;
 
   fetch("https://word-finder-9lr4.onrender.com/send-otp", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone: phoneNumber })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ phone: phone })
   })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       if (data.success) {
-        alert("OTP sent to " + phoneNumber);
+        alert("OTP sent!");
       } else {
-        alert("Failed: " + data.message);
+        alert("Failed: " + data.error);
       }
     })
-    .catch(err => {
-      console.error("Error sending OTP:", err);
-      alert("Send error. Check console.");
+    .catch((err) => {
+      console.error(err);
+      alert("Failed: " + err.message);
     });
 }
 
 function verifyOTP() {
-  const otp = document.getElementById("otp").value.trim();
+  const phone = document.getElementById("phone").value;
+  const otp = document.getElementById("otp").value;
 
   fetch("https://word-finder-9lr4.onrender.com/verify-otp", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone: phoneNumber, code: otp })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ phone: phone, code: otp })
   })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       if (data.success) {
-        alert("✅ Verified!");
+        alert("✅ Phone Verified!");
       } else {
-        alert("❌ " + data.message);
+        alert("❌ Verification Failed: " + data.error);
       }
     })
-    .catch(err => {
-      console.error("Error verifying OTP:", err);
-      alert("Verify error. Check console.");
+    .catch((err) => {
+      console.error(err);
+      alert("Failed: " + err.message);
     });
 }
+
+// Expose to global scope for onclick to work
+window.sendOTP = sendOTP;
+window.verifyOTP = verifyOTP;
 console.log("Sending OTP to:", phone);
 .then((data) => {
   console.log("Server Response:", data);
