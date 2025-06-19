@@ -1,49 +1,64 @@
-const API_URL = 'https://word-finder-9lr4.onrender.com'; // Your live backend
-
-let sessionId = null;
+let phoneNumber = "";
 
 // Send OTP
 function sendOTP() {
-  const phone = document.getElementById("phone").value;
+  phoneNumber = document.getElementById("phone").value.trim();
 
-  fetch(`${API_URL}/send-otp`, {
+  if (!phoneNumber || !phoneNumber.startsWith("+")) {
+    alert("Please enter a valid phone number with country code (e.g., +91XXXXXXXXXX)");
+    return;
+  }
+
+  fetch("https://word-finder-9lr4.onrender.com/send-otp", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ phone: phoneNumber })
   })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      alert("✅ OTP sent to your phone!");
-      window.sessionId = data.sessionId;
-    } else {
-      alert("❌ Error: " + data.message);
-    }
-  })
-  .catch((err) => {
-    console.error("Request error:", err);
-    alert("Server error while sending OTP.");
-  });
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        alert("✅ OTP sent to " + phoneNumber);
+      } else {
+        alert("❌ Failed to send OTP: " + data.message);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("❌ Error sending OTP. Please try again.");
+    });
 }
+
 // Verify OTP
 function verifyOTP() {
-  const otp = document.getElementById("otp").value;
+  const otp = document.getElementById("otp").value.trim();
 
-  fetch(`${API_URL}/verify-otp`, {
+  if (!otp || otp.length < 4) {
+    alert("Please enter the OTP you received.");
+    return;
+  }
+
+  fetch("https://word-finder-9lr4.onrender.com/verify-otp", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code: otp, sessionId })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      phone: phoneNumber,
+      code: otp
+    })
   })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      alert("🎉 OTP Verified! Welcome to Word Finder.");
-    } else {
-      alert("❌ Invalid OTP!");
-    }
-  })
-  .catch((err) => {
-    console.error(err);
-    alert("Server error while verifying OTP.");
-  });
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        alert("🎉 Phone verified successfully!");
+      } else {
+        alert("❌ Invalid OTP: " + data.message);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("❌ Error verifying OTP. Please try again.");
+    });
 }
