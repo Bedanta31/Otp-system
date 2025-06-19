@@ -1,14 +1,11 @@
-// Import Firebase
+// Firebase Setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import {
   getAuth,
   RecaptchaVerifier,
-  signInWithPhoneNumber,
-  signOut,
-  onAuthStateChanged
+  signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-// 🔧 Your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDnKHoj2smR0z9zCZH5A9fJCsFokd9U_ag",
   authDomain: "otp-system-71b21.firebaseapp.com",
@@ -18,76 +15,51 @@ const firebaseConfig = {
   appId: "1:767014524390:web:5ca45f8a31fbbf194af227"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 // Setup reCAPTCHA
 window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
   size: "normal",
-  callback: () => {
-    document.getElementById("sign-in-button").disabled = false;
+  callback: (response) => {
+    console.log("reCAPTCHA verified ✅");
   },
   "expired-callback": () => {
-    document.getElementById("sign-in-button").disabled = true;
+    alert("reCAPTCHA expired. Please verify again.");
   }
 });
 recaptchaVerifier.render();
 
-// Sign In Button Click
-document.getElementById("sign-in-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const phoneNumber = document.getElementById("phone-number").value;
+// 🔐 Send OTP
+window.sendOTP = function () {
+  const phoneNumber = document.getElementById("phone").value;
 
   signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
     .then((confirmationResult) => {
       window.confirmationResult = confirmationResult;
-      alert("OTP sent!");
+      alert("OTP sent to " + phoneNumber);
     })
     .catch((error) => {
-      alert("Error: " + error.message);
+      alert("Error sending OTP: " + error.message);
       console.error(error);
     });
-});
+};
 
-// Verify OTP
-document.getElementById("verification-code-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const code = document.getElementById("verification-code").value;
+// ✅ Verify OTP
+window.verifyOTP = function () {
+  const code = document.getElementById("otp").value;
 
-  confirmationResult
-    .confirm(code)
-    .then((result) => {
-      alert("Phone number verified!");
-      document.getElementById("sign-in-status").innerText = "Signed In";
-      document.getElementById("account-details").innerText = JSON.stringify(result.user, null, 2);
-    })
-    .catch((error) => {
-      alert("Invalid OTP.");
-      console.error(error);
-    });
-});
-
-// Cancel Verification
-document.getElementById("cancel-verify-code-button").addEventListener("click", () => {
-  document.getElementById("verification-code").value = "";
-});
-
-// Sign Out
-document.getElementById("sign-out-button").addEventListener("click", () => {
-  signOut(auth).then(() => {
-    document.getElementById("sign-in-status").innerText = "Signed Out";
-    document.getElementById("account-details").innerText = "null";
-  });
-});
-
-// Update Auth Status Live
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    document.getElementById("sign-in-status").innerText = "Signed In";
-    document.getElementById("account-details").innerText = JSON.stringify(user, null, 2);
-  } else {
-    document.getElementById("sign-in-status").innerText = "Signed Out";
-    document.getElementById("account-details").innerText = "null";
+  if (!window.confirmationResult) {
+    alert("Please request OTP first!");
+    return;
   }
-});
+
+  window.confirmationResult.confirm(code)
+    .then((result) => {
+      alert("Phone number verified! 🎉");
+      console.log("User:", result.user);
+    })
+    .catch((error) => {
+      alert("Invalid OTP: " + error.message);
+    });
+};
