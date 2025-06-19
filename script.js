@@ -1,64 +1,50 @@
 let phoneNumber = "";
 
-// Send OTP
 function sendOTP() {
   phoneNumber = document.getElementById("phone").value.trim();
 
-  if (!phoneNumber || !phoneNumber.startsWith("+")) {
-    alert("Please enter a valid phone number with country code (e.g., +91XXXXXXXXXX)");
+  if (!phoneNumber.startsWith("+")) {
+    alert("Use international format like +91...");
     return;
   }
 
   fetch("https://word-finder-9lr4.onrender.com/send-otp", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ phone: phoneNumber })
   })
-    .then((res) => res.json())
-    .then((data) => {
+    .then(res => res.json())
+    .then(data => {
       if (data.success) {
-        alert("✅ OTP sent to " + phoneNumber);
+        alert("OTP sent to " + phoneNumber);
       } else {
-        alert("❌ Failed to send OTP: " + data.message);
+        alert("Failed: " + data.message);
       }
     })
-    .catch((err) => {
-      console.error(err);
-      alert("❌ Error sending OTP. Please try again.");
+    .catch(err => {
+      console.error("Error sending OTP:", err);
+      alert("Send error. Check console.");
     });
 }
 
-// Verify OTP
 function verifyOTP() {
   const otp = document.getElementById("otp").value.trim();
 
-  if (!otp || otp.length < 4) {
-    alert("Please enter the OTP you received.");
-    return;
-  }
-
   fetch("https://word-finder-9lr4.onrender.com/verify-otp", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      phone: phoneNumber,
-      code: otp
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone: phoneNumber, code: otp })
   })
-    .then((res) => res.json())
-    .then((data) => {
+    .then(res => res.json())
+    .then(data => {
       if (data.success) {
-        alert("🎉 Phone verified successfully!");
+        alert("✅ Verified!");
       } else {
-        alert("❌ Invalid OTP: " + data.message);
+        alert("❌ " + data.message);
       }
     })
-    .catch((err) => {
-      console.error(err);
-      alert("❌ Error verifying OTP. Please try again.");
+    .catch(err => {
+      console.error("Error verifying OTP:", err);
+      alert("Verify error. Check console.");
     });
 }
