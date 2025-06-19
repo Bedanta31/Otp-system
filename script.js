@@ -2,6 +2,7 @@ let phoneNumber = "";
 
 function sendOTP() {
   const phone = document.getElementById("phone").value;
+  console.log("Sending OTP to:", phone);
 
   fetch("https://word-finder-9lr4.onrender.com/send-otp", {
     method: "POST",
@@ -12,15 +13,16 @@ function sendOTP() {
   })
     .then((res) => res.json())
     .then((data) => {
+      console.log("Server Response:", data);
       if (data.success) {
-        alert("OTP sent!");
+        alert("✅ OTP sent!");
       } else {
-        alert("Failed: " + data.error);
+        alert("❌ Failed: " + data.error);
       }
     })
     .catch((err) => {
       console.error(err);
-      alert("Failed: " + err.message);
+      alert("❌ Failed: " + err.message);
     });
 }
 
@@ -37,6 +39,7 @@ function verifyOTP() {
   })
     .then((res) => res.json())
     .then((data) => {
+      console.log("Verification Response:", data);
       if (data.success) {
         alert("✅ Phone Verified!");
       } else {
@@ -45,19 +48,10 @@ function verifyOTP() {
     })
     .catch((err) => {
       console.error(err);
-      alert("Failed: " + err.message);
+      alert("❌ Failed: " + err.message);
     });
 }
 
-// Expose to global scope for onclick to work
+// ✅ Make available to your HTML <button onclick="...">
 window.sendOTP = sendOTP;
 window.verifyOTP = verifyOTP;
-console.log("Sending OTP to:", phone);
-.then((data) => {
-  console.log("Server Response:", data);
-  if (data.success) {
-    alert("OTP sent successfully!");
-  } else {
-    alert("Failed: " + (data.error || data.message || "Unknown error"));
-  }
-})
