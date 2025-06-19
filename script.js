@@ -48,3 +48,12 @@ function verifyOTP() {
       alert("Verify error. Check console.");
     });
 }
+console.log("Sending OTP to:", phone);
+.then((data) => {
+  console.log("Server Response:", data);
+  if (data.success) {
+    alert("OTP sent successfully!");
+  } else {
+    alert("Failed: " + (data.error || data.message || "Unknown error"));
+  }
+})
