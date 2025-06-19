@@ -15,17 +15,16 @@ function sendOTP() {
   .then(data => {
     if (data.success) {
       alert("✅ OTP sent to your phone!");
-      sessionId = data.sessionId;
+      window.sessionId = data.sessionId;
     } else {
       alert("❌ Error: " + data.message);
     }
   })
   .catch((err) => {
-    console.error(err);
-    alert("Server error while sending OTP!");
+    console.error("Request error:", err);
+    alert("Server error while sending OTP.");
   });
 }
-
 // Verify OTP
 function verifyOTP() {
   const otp = document.getElementById("otp").value;
